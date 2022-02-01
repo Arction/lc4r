@@ -10,15 +10,33 @@ Please note that LightningChart JS is not allowed to be used commercially withou
 
 # Features
 
-Write here about features of the `lcjs4r` package.
-
-# About LightningChart JS
+## LightningChart JS
 
 LightningChart JS is the proven performance leader in the field of JavaScript data visualization. We are changing the capabilities of web data visualization by providing **high-performance charts with real-time capabilities and optimized CPU usage**.
 
 You can learn more about the product on our web site [lightningchart.com](https://www.arction.com/lightningchart-js/).
 
 To see our charts in action, you can check our [Interactive Examples gallery](https://www.arction.com/lightningchart-js-interactive-examples/). This can give you an idea of the different use cases for LightningCharts.
+
+## LightningChart for R
+
+Write here about features of the `lcjs4r` package.
+
+# Installation
+
+The latest version of `lcjs4r` can be installed via R `devtools`.
+
+If you don't have `devtools` installed, do that with the following command in R console:
+
+```r
+install.packages("devtools")
+```
+
+Install the latest `lcjs4r` version with following R console command:
+
+```r
+devtools::install_github("Arction/lcjs4r")
+```
 
 # Usage
 
