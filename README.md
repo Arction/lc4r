@@ -42,3 +42,7 @@ lc4r(list(
     lcSeries(x = scatter_data$x0, y = scatter_data$y0)
 ))
 ```
+
+# Contributing
+
+Write here some instructions how the package can be developed, forked and contributed.
