@@ -71,26 +71,21 @@ devtools::install_github("Arction/lcjs4r")
 
 # Usage
 
-**Example, scatter chart**
+**Example, basic scatter chart usage**
 
 ```r
 library(lc4r)
 
 lc4r(
-    lcSeries(x = scatter_data$x0, y = scatter_data$y0),
+    lcSeries(
+        type = 'scatter',
+        x = diamonds$carat,
+        y = diamonds$price
+    )
 )
 ```
 
-**Example, multiple series in same chart**
-
-```r
-library(lc4r)
-
-lc4r(list(
-    lcSeries(x = scatter_data$x0, y = scatter_data$y0),
-    lcSeries(x = scatter_data$x0, y = scatter_data$y0)
-))
-```
+You can find more examples right here in [GitHub](./examples)
 
 # Things to add
 
