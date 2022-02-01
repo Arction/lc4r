@@ -37,17 +37,21 @@ Please note that LightningChart JS is not allowed to be used commercially withou
 
 ![Interactive R Heatmap Chart](./screenshots/heatmap.jpeg)
 
-## LightningChart JS
+## About LightningChart JS
 
 LightningChart JS is the proven performance leader in the field of JavaScript data visualization. We are changing the capabilities of web data visualization by providing **high-performance charts with real-time capabilities and optimized CPU usage**.
 
 You can learn more about the product on our web site [lightningchart.com](https://www.arction.com/lightningchart-js/).
 
-To see our charts in action, you can check our [Interactive Examples gallery](https://www.arction.com/lightningchart-js-interactive-examples/). This can give you an idea of the different use cases for LightningCharts.
+To see our charts in action, you can check our [Interactive Examples gallery](https://www.arction.com/lightningchart-js-interactive-examples/). At the time of writing we have a grand total of **112 different chart examples** covering a wide variety of fields and use cases, such as:
 
-## LightningChart for R
-
-Write here about features of the `lcjs4r` package.
+- Trading
+- Research
+- Medicine
+- Statistics
+- Business and Finance
+- Geographical data visualization
+- ...and a **stunning** amount of general data visualization examples that are not tied to any particular field.
 
 # Installation and usage
 
