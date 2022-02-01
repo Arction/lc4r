@@ -21,6 +21,13 @@ Please note that LightningChart JS is not allowed to be used commercially withou
 
 ![Interactive R Bubble Chart](./screenshots/bubble.jpeg)
 
+**Line charts**
+
+- Fully interactive (zooming, panning, data cursor)
+- Up to **500 million** (500 000 000) data points
+
+![Interactive R Line Chart](./screenshots/line.jpeg)
+
 **Heatmap charts**
 
 - Fully interactive (zooming, panning, data cursor)
@@ -80,6 +87,16 @@ lc4r(list(
     lcSeries(x = scatter_data$x0, y = scatter_data$y0)
 ))
 ```
+
+# Things to add
+
+There are countless features in LightningChart JS that could be added into the R package. Here's some honorable mentions which we think would be especially interesting:
+
+- Color palettes for line charts
+- Color palettes for scatter charts
+- 3D surface charts
+- Threshold indicators
+- Band indicators
 
 # Contributing
 
