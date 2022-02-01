@@ -1,0 +1,9 @@
+Package: lc4r
+Title: An open-source wrapper that brings the highest performance JavaScript charts into R
+Version: 0.0.0.9000
+Description: Provides interfaces for visualizing data in R with interactive hardware accelerated charts
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
