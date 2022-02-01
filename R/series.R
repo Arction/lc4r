@@ -4,6 +4,8 @@ lcSeries <- function(
     type = 'scatter',
     x = NULL,
     y = NULL,
+    intensity = NULL,
+    palette = NULL,
     point_size = NULL,
     point_color = NULL,
     point_shape = NULL,
@@ -15,6 +17,8 @@ lcSeries <- function(
   series$type <- type
   series$x <- x
   series$y <- y
+  series$intensity <- intensity
+  series$palette <- palette
   series$point_size <- point_size
   series$point_color <- point_color
   series$point_shape <- point_shape

@@ -10,6 +10,15 @@ Please note that LightningChart JS is not allowed to be used commercially withou
 
 # Features
 
+**Heatmaps**
+
+- Fully interactive (zooming, panning, data cursor)
+- Up to **1.2 billion** (1 200 000 000) data points
+- Supports R color palettes (native, `RColorBrewer`, `Viridis`)
+- Automatic bilinear color interpolation based on adjacent cell values
+
+![Interactive R Heatmap Chart](./screenshots/heatmap.jpeg)
+
 ## LightningChart JS
 
 LightningChart JS is the proven performance leader in the field of JavaScript data visualization. We are changing the capabilities of web data visualization by providing **high-performance charts with real-time capabilities and optimized CPU usage**.
@@ -22,7 +31,7 @@ To see our charts in action, you can check our [Interactive Examples gallery](ht
 
 Write here about features of the `lcjs4r` package.
 
-# Installation
+# Installation and usage
 
 The latest version of `lcjs4r` can be installed via R `devtools`.
 
