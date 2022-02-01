@@ -10,7 +10,18 @@ Please note that LightningChart JS is not allowed to be used commercially withou
 
 # Features
 
-**Heatmaps**
+**Scatter charts**
+
+- Fully interactive (zooming, panning, data cursor)
+- Up to **75 million** (75 000 000) data points
+- `circle`, `square` and `triangle` markers
+- Supports individual point sizes and transparent points
+
+![Interactive R Scatter Chart](./screenshots/scatter.jpeg)
+
+![Interactive R Bubble Chart](./screenshots/bubble.jpeg)
+
+**Heatmap charts**
 
 - Fully interactive (zooming, panning, data cursor)
 - Up to **1.2 billion** (1 200 000 000) data points

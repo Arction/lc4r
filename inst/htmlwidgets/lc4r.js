@@ -47,6 +47,8 @@ HTMLWidgets.widget({
               type,
               x,
               y,
+              axis_x,
+              axis_y,
               intensity,
               palette,
               point_size,
@@ -67,6 +69,13 @@ HTMLWidgets.widget({
                     triangle: PointShape.Triangle,
                   }[point_shape.toLowerCase()]
                 : PointShape.Circle;
+
+            if (axis_x) {
+              axisX.setTitle(axis_x);
+            }
+            if (axis_y) {
+              axisY.setTitle(axis_y);
+            }
 
             let series;
             if (type === "scatter") {
