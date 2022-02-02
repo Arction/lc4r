@@ -6,7 +6,9 @@ lcSeries <- function(
     y = NULL,
     axis_x = NULL,
     axis_y = NULL,
+    axis_z = NULL,
     intensity = NULL,
+    heightmap = NULL,
     palette = NULL,
     point_size = NULL,
     point_color = NULL,
@@ -21,7 +23,9 @@ lcSeries <- function(
   series$y <- y
   series$axis_x <- axis_x
   series$axis_y <- axis_y
+  series$axis_z <- axis_z
   series$intensity <- intensity
+  series$heightmap <- heightmap
   series$palette <- palette
   series$point_size <- point_size
   series$point_color <- point_color

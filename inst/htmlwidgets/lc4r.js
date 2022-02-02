@@ -10,26 +10,12 @@ HTMLWidgets.widget({
       SolidFill,
       emptyLine,
       PalettedFill,
+      ColorShadingStyles,
     } = lcjs;
-
-    const chart = lightningChart().ChartXY({
-      theme: Themes.lightNew,
-    });
-    const axisX = chart.getDefaultAxisX();
-    const axisY = chart.getDefaultAxisY();
 
     return {
       renderValue: function (args) {
-        let { components, title_chart } = args;
-
-        // #region Args: Chart title
-        if (title_chart) {
-          chart.setTitle(title_chart);
-        } else {
-          chart.setTitle("");
-        }
-
-        // #endregion
+        let { components, title } = args;
 
         // #region Args: Components
         if ("id_" in components) {
@@ -40,6 +26,31 @@ HTMLWidgets.widget({
           components = Array.from(components);
         }
 
+        // #endregion
+
+        const is3D =
+          components.find((component) => component.type === "surface") !==
+          undefined;
+        const is2D = !is3D;
+
+        const theme = Themes.lightNew;
+        const chart = is2D
+          ? lightningChart().ChartXY({ theme })
+          : lightningChart().Chart3D({ theme });
+        chart.setPadding({ bottom: 20 });
+        const axisX = chart.getDefaultAxisX();
+        const axisY = chart.getDefaultAxisY();
+        const axisZ = is3D && chart.getDefaultAxisZ();
+
+        // #region Args: Chart title
+        if (title) {
+          chart.setTitle(title);
+        } else {
+          chart.setTitle("");
+        }
+
+        // #endregion
+
         components.forEach((component) => {
           const { id_ } = component;
           ifTry(id_ === "series", (_) => {
@@ -49,7 +60,9 @@ HTMLWidgets.widget({
               y,
               axis_x,
               axis_y,
+              axis_z,
               intensity,
+              heightmap,
               palette,
               point_size,
               point_color,
@@ -75,6 +88,9 @@ HTMLWidgets.widget({
             }
             if (axis_y) {
               axisY.setTitle(axis_y);
+            }
+            if (axis_z && axisZ) {
+              axisZ.setTitle(axis_z);
             }
 
             let series;
@@ -114,6 +130,32 @@ HTMLWidgets.widget({
                   new PalettedFill({
                     lookUpProperty: "value",
                     lut: parsePalette(lcjs, palette, intensityMatrix),
+                  })
+                );
+              }
+            } else if (type === "surface") {
+              // heightmap values must be specified
+              if (!heightmap) {
+                throw new Error("'heightmap' not specified");
+              }
+
+              const heightMatrix = Array.from(heightmap);
+              const columns = heightMatrix.length;
+              const rows = heightMatrix[0].length;
+              series = chart
+                .addSurfaceGridSeries({
+                  columns,
+                  rows,
+                  dataOrder: "columns",
+                })
+                .invalidateHeightMap(heightMatrix)
+                .setWireframeStyle(emptyLine);
+
+              if (palette) {
+                series.setFillStyle(
+                  new PalettedFill({
+                    lookUpProperty: "y",
+                    lut: parsePalette(lcjs, palette, heightMatrix),
                   })
                 );
               }
@@ -159,29 +201,30 @@ HTMLWidgets.widget({
                 )
               );
             });
-
-            // #region Construct LCJS data points array and push to series
-            const pointsCount = Math.max(
-              coordsX ? coordsX.length : 0,
-              coordsY ? coordsY.length : 0
-            );
-            const points = new Array(pointsCount).fill().map((_) => ({}));
-            if (coordsX) {
-              coordsX.forEach((x, i) => (points[i].x = x));
-            } else {
-              points.forEach((p, i) => (p.x = i));
-            }
-            if (coordsY) {
-              coordsY.forEach((y, i) => (points[i].y = y));
-            } else {
-              points.forEach((p, i) => (p.y = i));
-            }
-            if (pointSizes) {
-              pointSizes.forEach((size, i) => (points[i].size = size));
-            }
-            series.add(points);
-
-            // #endregion
+            ifTry("setColorShadingStyle" in series, (_) => {
+              series.setColorShadingStyle(new ColorShadingStyles.Phong());
+            });
+            ifTry("add" in series, (_) => {
+              const pointsCount = Math.max(
+                coordsX ? coordsX.length : 0,
+                coordsY ? coordsY.length : 0
+              );
+              const points = new Array(pointsCount).fill().map((_) => ({}));
+              if (coordsX) {
+                coordsX.forEach((x, i) => (points[i].x = x));
+              } else {
+                points.forEach((p, i) => (p.x = i));
+              }
+              if (coordsY) {
+                coordsY.forEach((y, i) => (points[i].y = y));
+              } else {
+                points.forEach((p, i) => (p.y = i));
+              }
+              if (pointSizes) {
+                pointSizes.forEach((size, i) => (points[i].size = size));
+              }
+              series.add(points);
+            });
           });
         });
 
@@ -189,6 +232,9 @@ HTMLWidgets.widget({
 
         axisX.fit(false);
         axisY.fit(false);
+        if (axisZ) {
+          axisZ.fit(false);
+        }
       },
       resize: function (width, height) {
         chart.engine.layout();

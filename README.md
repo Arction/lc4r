@@ -31,11 +31,22 @@ Please note that LightningChart JS is not allowed to be used commercially withou
 **Heatmap charts**
 
 - Fully interactive (zooming, panning, data cursor)
-- Up to **1.2 billion** (1 200 000 000) data points
+- Up to **5.6 billion** (5 600 000 000) data points
 - Supports R color palettes (native, `RColorBrewer`, `Viridis`)
 - Automatic bilinear color interpolation based on adjacent cell values
 
 ![Interactive R Heatmap Chart](./screenshots/heatmap.jpeg)
+
+**Surface charts**
+
+- Fully interactive (zooming, panning, rotation)
+- Up to **2 billion** (2 000 000 000) data points
+- Supports R color palettes (native, `RColorBrewer`, `Viridis`)
+  - Currently only coloring by Y but could be extended to color by separate data set
+- Automatic bilinear color interpolation based on adjacent cell values
+- Beautiful Phong shading for better depth perception
+
+![Interactive R Surface Chart](./screenshots/surface.jpeg)
 
 ## About LightningChart JS
 

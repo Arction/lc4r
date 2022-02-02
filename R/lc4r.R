@@ -7,11 +7,11 @@
 #' @export
 lc4r <- function(
   components,
-  title_chart = NULL
+  title = NULL
 ) {
   args <- list()
   args$components <- components
-  args$title_chart <- title_chart
+  args$title <- title
 
   # create widget
   htmlwidgets::createWidget(
