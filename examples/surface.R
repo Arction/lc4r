@@ -5,7 +5,6 @@ print(
   lc4r(lcSeries(
     type = 'surface',
     heightmap = volcano,
-    palette = heat.colors(10),
-    wireframe = TRUE
+    palette = heat.colors(10)
   ), title = 'Volcano surface')
 )
