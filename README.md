@@ -69,7 +69,11 @@ print(lc4r(lcSeries(
 )))
 ```
 
-You can find more examples right here in [GitHub](./examples)
+You can find more example R scripts right here in [GitHub](./examples)
+
+Apart from example scripts, the best place to learn about package usage is to view the package documentation in `RStudio`:
+
+![RStudio lc4r documentation](./readme/screenshots/package.png)
 
 # About LightningChart JS
 
