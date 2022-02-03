@@ -1,5 +1,4 @@
 library(lc4r)
-library(RColorBrewer)
 
 print(
   lc4r(lcSeries(
