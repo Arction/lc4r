@@ -1,13 +1,3 @@
-# Status
-
-**This R package is currently in early stages of drafting**.
-
-We are actively testing how different LightningChart JS features fit in the R ecosystem.
-
-The package can be freely used or even customized. Feel free to create issues and pull requests if you have improvement suggestions.
-
-Please note that LightningChart JS is not allowed to be used commercially without [purchasing a license](https://www.arction.com/lightningchart-js-pricing/).
-
 # Features
 
 **Scatter charts**
@@ -17,16 +7,16 @@ Please note that LightningChart JS is not allowed to be used commercially withou
 - `circle`, `square` and `triangle` markers
 - Supports individual point sizes and transparent points
 
-![Interactive R Scatter Chart](./screenshots/scatter.jpeg)
+![Interactive R Scatter Chart](./readme/screenshots/scatter.jpeg)
 
-![Interactive R Bubble Chart](./screenshots/bubble.jpeg)
+![Interactive R Bubble Chart](./readme/screenshots/bubble.jpeg)
 
 **Line charts**
 
 - Fully interactive (zooming, panning, data cursor)
 - Up to **500 million** (500 000 000) data points
 
-![Interactive R Line Chart](./screenshots/line.jpeg)
+![Interactive R Line Chart](./readme/screenshots/line.jpeg)
 
 **Heatmap charts**
 
@@ -35,7 +25,7 @@ Please note that LightningChart JS is not allowed to be used commercially withou
 - Supports R color palettes (native, `RColorBrewer`, `Viridis`)
 - Automatic bilinear color interpolation based on adjacent cell values
 
-![Interactive R Heatmap Chart](./screenshots/heatmap.jpeg)
+![Interactive R Heatmap Chart](./readme/screenshots/heatmap.jpeg)
 
 **Surface charts**
 
@@ -46,23 +36,7 @@ Please note that LightningChart JS is not allowed to be used commercially withou
 - Automatic bilinear color interpolation based on adjacent cell values
 - Beautiful Phong shading for better depth perception
 
-![Interactive R Surface Chart](./screenshots/surface.jpeg)
-
-## About LightningChart JS
-
-LightningChart JS is the proven performance leader in the field of JavaScript data visualization. We are changing the capabilities of web data visualization by providing **high-performance charts with real-time capabilities and optimized CPU usage**.
-
-You can learn more about the product on our web site [lightningchart.com](https://www.arction.com/lightningchart-js/).
-
-To see our charts in action, you can check our [Interactive Examples gallery](https://www.arction.com/lightningchart-js-interactive-examples/). At the time of writing we have a grand total of **112 different chart examples** covering a wide variety of fields and use cases, such as:
-
-- Trading
-- Research
-- Medicine
-- Statistics
-- Business and Finance
-- Geographical data visualization
-- ...and a **stunning** amount of general data visualization examples that are not tied to any particular field.
+![Interactive R Surface Chart](./readme/screenshots/surface.jpeg)
 
 # Installation and usage
 
@@ -97,16 +71,40 @@ print(lc4r(lcSeries(
 
 You can find more examples right here in [GitHub](./examples)
 
+# About LightningChart JS
+
+LightningChart JS is the proven performance leader in the field of JavaScript data visualization. We are changing the capabilities of web data visualization by providing **high-performance charts with real-time capabilities and optimized CPU usage**.
+
+You can learn more about the product on our web site [lightningchart.com](https://www.arction.com/lightningchart-js/).
+
+Please note that LightningChart JS is not allowed to be used commercially without [purchasing a license](https://www.arction.com/lightningchart-js-pricing/).
+
+To see our charts in action, you can check our [Interactive Examples gallery](https://www.arction.com/lightningchart-js-interactive-examples/). At the time of writing we have a grand total of **112 different chart examples** covering a wide variety of fields and use cases, such as:
+
+- Trading
+- Research
+- Medicine
+- Statistics
+- Business and Finance
+- Geographical data visualization
+- ...and a **stunning** amount of general data visualization examples that are not tied to any particular field.
+
 # Things to add
 
 There are countless features in LightningChart JS that could be added into the R package. Here's some honorable mentions which we think would be especially interesting:
 
 - Color palettes for line charts
 - Color palettes for scatter charts
-- 3D surface charts
 - Threshold indicators
 - Band indicators
+- Area series
+- Area Range series
+- Candlestick series
+- Polar charts
 
 # Contributing
 
-Write here some instructions how the package can be developed, forked and contributed.
+Anyone is welcome to contribute towards improving `lc4r` by
+
+- Suggesting improvements, changes or new features by [creating an issue in GitHub](./readme/creating-issue.md)
+- Taking the initiative and implementing an improvement in the package and [creating a pull request in GitHub](./readme/creating-pull-request.md)
