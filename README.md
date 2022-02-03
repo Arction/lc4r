@@ -87,13 +87,12 @@ devtools::install_github("Arction/lcjs4r")
 ```r
 library(lc4r)
 
-lc4r(
-    lcSeries(
-        type = 'scatter',
-        x = diamonds$carat,
-        y = diamonds$price
-    )
-)
+data <- mtcars[,c('wt','mpg')]
+print(lc4r(lcSeries(
+  type = 'scatter',
+  x = data$wt,
+  y = data$mpg
+)))
 ```
 
 You can find more examples right here in [GitHub](./examples)
