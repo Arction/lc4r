@@ -40,7 +40,7 @@
 
 # Installation and usage
 
-The latest version of `lcjs4r` can be installed via R `devtools`.
+The latest version of `lc4r` can be installed via R `devtools`.
 
 If you don't have `devtools` installed, do that with the following command in R console:
 
@@ -48,10 +48,10 @@ If you don't have `devtools` installed, do that with the following command in R 
 install.packages("devtools")
 ```
 
-Install the latest `lcjs4r` version with following R console command:
+Install the latest `lc4r` version with following R console command:
 
 ```r
-devtools::install_github("Arction/lcjs4r")
+devtools::install_github("Arction/lc4r")
 ```
 
 # Usage
