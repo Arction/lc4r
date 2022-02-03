@@ -9,13 +9,63 @@ HTMLWidgets.widget({
       Themes,
       SolidFill,
       emptyLine,
+      emptyFill,
       PalettedFill,
       ColorShadingStyles,
+      UIOrigins,
+      synchronizeAxisIntervals,
+      AxisTickStrategies,
+      translatePoint,
     } = lcjs;
 
     return {
       renderValue: function (args) {
         let { components, title } = args;
+
+        const theme = Themes.lightNew;
+        const maxRows = 10;
+        const dashboard = lightningChart().Dashboard({
+          theme,
+          numberOfColumns: 1,
+          numberOfRows: maxRows,
+        });
+        const charts = [];
+        const updateDashboardSizeDistribution = () => {
+          for (let i = 0; i < maxRows; i += 1) {
+            dashboard.setRowHeight(i, 0.00001);
+          }
+          const usedRows = [
+            ...new Set(charts.map((chart) => chart.rowIndex)),
+          ].sort();
+          usedRows.forEach((rowIndex) => dashboard.setRowHeight(rowIndex, 1));
+
+          if (title) {
+            const topCharts = charts.filter(
+              (chart) => chart.rowIndex === usedRows[0]
+            );
+            topCharts.forEach((chart) => chart.chart.setPadding({ top: 24 }));
+          }
+          const bottomCharts = charts.filter(
+            (chart) => chart.rowIndex === usedRows[usedRows.length - 1]
+          );
+          bottomCharts.forEach((chart) =>
+            chart.chart.setPadding({ bottom: 20 })
+          );
+        };
+
+        // #region Args: Chart title
+        if (title) {
+          dashboard
+            .addUIElement(undefined, dashboard.uiScale)
+            .setText(title)
+            .setBackground((background) =>
+              background.setFillStyle(emptyFill).setStrokeStyle(emptyLine)
+            )
+            .setOrigin(UIOrigins.CenterTop)
+            .setPosition({ x: 50, y: 100 });
+        }
+
+        // #endregion
 
         // #region Args: Components
         if ("id_" in components) {
@@ -28,31 +78,11 @@ HTMLWidgets.widget({
 
         // #endregion
 
-        const is3D =
-          components.find((component) => component.type === "surface") !==
-          undefined;
-        const is2D = !is3D;
-
-        const theme = Themes.lightNew;
-        const chart = is2D
-          ? lightningChart().ChartXY({ theme })
-          : lightningChart().Chart3D({ theme });
-        chart.setPadding({ bottom: 20 });
-        const axisX = chart.getDefaultAxisX();
-        const axisY = chart.getDefaultAxisY();
-        const axisZ = is3D && chart.getDefaultAxisZ();
-
-        // #region Args: Chart title
-        if (title) {
-          chart.setTitle(title);
-        } else {
-          chart.setTitle("");
-        }
-
-        // #endregion
+        const axisGroupsX = {};
 
         components.forEach((component) => {
           const { id_ } = component;
+
           ifTry(id_ === "series", (_) => {
             const {
               type,
@@ -71,6 +101,59 @@ HTMLWidgets.widget({
               line_color,
             } = component;
 
+            const is3D = component.type === "surface";
+            const is2D = !is3D;
+
+            // #region Find or create chart for series
+
+            let chart, rowIndex, axisX, axisY, axisZ;
+            const sharedAxisX =
+              axis_x &&
+              axis_x.length > 0 &&
+              charts.find((existingChart) => existingChart.axis_x === axis_x);
+            const sharedAxisY =
+              axis_y &&
+              axis_y.length > 0 &&
+              charts.find((existingChart) => existingChart.axis_y === axis_y);
+            if (sharedAxisY) {
+              // Place series into existing chart, on the same Y axis
+              chart = sharedAxisY.chart;
+            }
+            if (!chart) {
+              // Create new chart for series
+              rowIndex = charts.reduce(
+                (prev, cur) => Math.max(prev, cur.rowIndex + 1),
+                0
+              );
+              const dashboardOptions = { columnIndex: 0, rowIndex };
+              chart = is2D
+                ? dashboard.createChartXY(dashboardOptions)
+                : dashboard.createChart3D(dashboardOptions);
+              chart.setTitle("");
+
+              if (sharedAxisX) {
+                // Synchronize X axis with an existing chart
+                axisGroupsX[axis_x] = axisGroupsX[axis_x] || [
+                  sharedAxisX.chart.getDefaultAxisX(),
+                ];
+                axisGroupsX[axis_x].push(chart.getDefaultAxisX());
+              }
+            }
+            axisX = axisX || chart.getDefaultAxisX();
+            axisY = axisY || chart.getDefaultAxisY();
+            axisZ = axisZ || (is3D && chart.getDefaultAxisZ());
+            charts.push({
+              chart,
+              rowIndex,
+              is3D,
+              is2D,
+              axis_x,
+              axis_y,
+              axis_z,
+            });
+
+            // #endregion
+
             const coordsX = x && parseArrayDataInput(x);
             const coordsY = y && parseArrayDataInput(y);
             let pointSizes = undefined;
@@ -83,14 +166,23 @@ HTMLWidgets.widget({
                   }[point_shape.toLowerCase()]
                 : PointShape.Circle;
 
-            if (axis_x) {
+            if (axis_x !== undefined) {
               axisX.setTitle(axis_x);
+              if (axis_x === "") {
+                axisX.setTickStrategy(AxisTickStrategies.Empty);
+              }
             }
-            if (axis_y) {
+            if (axis_y !== undefined) {
               axisY.setTitle(axis_y);
+              if (axis_y === "") {
+                axisY.setTickStrategy(AxisTickStrategies.Empty);
+              }
             }
-            if (axis_z && axisZ) {
+            if (axis_z !== undefined && axisZ) {
               axisZ.setTitle(axis_z);
+              if (axis_z === "") {
+                axisZ.setTickStrategy(AxisTickStrategies.Empty);
+              }
             }
 
             let series;
@@ -230,11 +322,53 @@ HTMLWidgets.widget({
 
         // #endregion
 
-        axisX.fit(false);
-        axisY.fit(false);
-        if (axisZ) {
-          axisZ.fit(false);
-        }
+        ifTry(true, (_) => {
+          updateDashboardSizeDistribution();
+        });
+
+        ifTry(true, (_) => {
+          charts.forEach((chart) => {
+            chart.chart.getDefaultAxisX().fit(false);
+            chart.chart.getDefaultAxisY().fit(false);
+            if ("getDefaultAxisZ" in chart.chart) {
+              chart.chart.getDefaultAxisZ().fit(false);
+            }
+          });
+        });
+
+        ifTry(true, (_) => {
+          Object.values(axisGroupsX).forEach((axisGroup) => {
+            synchronizeAxisIntervals(...axisGroup);
+            axisGroup.forEach((axis, i) => {
+              if (i < axisGroup.length - 1) {
+                axis
+                  .setTickStrategy(AxisTickStrategies.Empty)
+                  .setTitle("")
+                  .setStrokeStyle(emptyLine);
+              }
+            });
+            requestAnimationFrame(() => {
+              const maxMarginLeft = axisGroup.reduce(
+                (prev, cur) =>
+                  Math.max(
+                    prev,
+                    translatePoint(
+                      { x: cur.getInterval().start, y: 0 },
+                      { x: cur, y: cur.chart.getDefaultAxisY() },
+                      cur.chart.pixelScale
+                    ).x
+                  ),
+                0
+              );
+              axisGroup.forEach((axis) => {
+                axis.chart
+                  .setPadding({ left: 0 })
+                  .getDefaultAxisY()
+                  .setThickness(maxMarginLeft);
+              });
+            });
+          });
+        });
       },
       resize: function (width, height) {
         chart.engine.layout();

@@ -1,5 +1,6 @@
 library(lc4r)
 
+library(tidyverse) # <-- required for pipe function (?)
 library(gapminder)
 data <- gapminder %>% filter(year=="2007") %>% dplyr::select(-year)
 
