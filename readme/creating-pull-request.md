@@ -12,6 +12,7 @@ Additionally, it can be valuable to know if there is [an existing issue](https:/
 
 Pull requests should exist for improving the package in any way:
 
+- Resolve an [issue](https://github.com/Arction/lcjs4r/issues)
 - Improve usage syntax
 - Integrate to work together with some other R package
 - Add new feature
