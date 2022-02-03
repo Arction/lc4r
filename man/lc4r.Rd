@@ -2,10 +2,26 @@
 % Please edit documentation in R/lc4r.R
 \name{lc4r}
 \alias{lc4r}
-\title{<Add Title>}
+\title{Create an interactive chart based on LightningChart JS.}
 \usage{
-lc4r(message, width = NULL, height = NULL, elementId = NULL)
+lc4r(components, title = NULL)
+}
+\arguments{
+\item{components}{A single component or \code{list} of components to visualize.
+Define components with \code{\link[=lcSeries]{lcSeries()}}}
+
+\item{title}{Optional title to display at the top of the chart.}
 }
 \description{
-<Add Description>
+In RStudio, this chart can be seen and interacted with in the \strong{Viewer} tab.
+}
+\details{
+LightningChart JS is a hardware accelerated high-performance data visualization library
+that allows visualizing much larger quantities of data than the built-in R data visualization tools.
+
+\code{lcjs4r} is an open source project. Anyone can suggest improvements or get involved
+in the \code{GitHub} page \href{https://github.com/Arction/lcjs4r}{lcjs4r}.
+}
+\seealso{
+\code{\link[=lcSeries]{lcSeries()}}
 }

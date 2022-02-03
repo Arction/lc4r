@@ -11,7 +11,7 @@ print(
       x = data$gdpPercap,
       y = data$lifeExp,
       point_size = pmax(data$pop/20000000, 3),
-      point_color = 'rgba(255, 0, 0, 0.5)'
+      point_color = '#ff000070'
     )
   )
 )

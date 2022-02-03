@@ -1,10 +1,20 @@
-#' <Add Title>
+#' Create an interactive chart based on LightningChart JS.
 #'
-#' <Add Description>
+#' In RStudio, this chart can be seen and interacted with in the **Viewer** tab.
+#'
+#' LightningChart JS is a hardware accelerated high-performance data visualization library
+#' that allows visualizing much larger quantities of data than the built-in R data visualization tools.
+#'
+#' \code{lcjs4r} is an open source project. Anyone can suggest improvements or get involved
+#' in the \code{GitHub} page [lcjs4r](https://github.com/Arction/lcjs4r).
+#'
+#' @param components    A single component or \code{list} of components to visualize.
+#'                      Define components with [lcSeries()]
+#' @param title         Optional title to display at the top of the chart.
 #'
 #' @import htmlwidgets
-#'
 #' @export
+#' @seealso   [lcSeries()]
 lc4r <- function(
   components,
   title = NULL
