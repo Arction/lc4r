@@ -1,6 +1,6 @@
 dependencies:
  - name: lightningchart-js
-   version: 3.3.3
-   src: htmlwidgets/lib/lcjs-3.3.3
+   version: 3.4.0
+   src: htmlwidgets/lib/lcjs-3.4.0
    script:
     - lcjs.iife.js

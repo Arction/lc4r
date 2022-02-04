@@ -16,15 +16,19 @@ HTMLWidgets.widget({
       synchronizeAxisIntervals,
       AxisTickStrategies,
       translatePoint,
+      transparentFill,
+      AutoCursorModes
     } = lcjs;
 
     return {
-      renderValue: function (args) {
+      renderValue: async function (args) {
         let { components, title } = args;
 
         const theme = Themes.lightNew;
         const maxRows = 10;
-        const dashboard = lightningChart().Dashboard({
+        const dashboard = lightningChart({
+          resourcesBaseUrl: 'https://cdn.jsdelivr.net/npm/@arction/lcjs@3.4.0/dist/resources'
+        }).Dashboard({
           theme,
           numberOfColumns: 1,
           numberOfRows: maxRows,
@@ -80,245 +84,319 @@ HTMLWidgets.widget({
 
         const axisGroupsX = {};
 
-        components.forEach((component) => {
+        for (const component of components) {
           const { id_ } = component;
+          // Assume id_ === 'series'
+          const {
+            type,
+            x,
+            y,
+            axis_x,
+            axis_y,
+            axis_z,
+            intensity,
+            heightmap,
+            palette,
+            point_size,
+            point_color,
+            point_shape,
+            line_thickness,
+            line_color,
+            map_data,
+            map_view
+          } = component;
 
-          ifTry(id_ === "series", (_) => {
-            const {
-              type,
-              x,
-              y,
-              axis_x,
-              axis_y,
-              axis_z,
-              intensity,
-              heightmap,
-              palette,
-              point_size,
-              point_color,
-              point_shape,
-              line_thickness,
-              line_color,
-            } = component;
+          const is3D = component.type === "surface";
+          const isMap = component.type === "map";
+          const is2D = !is3D && !isMap;
 
-            const is3D = component.type === "surface";
-            const is2D = !is3D;
+          // #region Find or create chart for series
 
-            // #region Find or create chart for series
+          let chart, rowIndex, axisX, axisY, axisZ;
+          const sharedAxisX =
+            axis_x &&
+            axis_x.length > 0 &&
+            charts.find((existingChart) => existingChart.axis_x === axis_x);
+          const sharedAxisY =
+            axis_y &&
+            axis_y.length > 0 &&
+            charts.find((existingChart) => existingChart.axis_y === axis_y);
+          const mapAxis = (axis_x === 'map' || axis_y === 'map') && charts.find((existingChart) => existingChart.isMap)
 
-            let chart, rowIndex, axisX, axisY, axisZ;
-            const sharedAxisX =
-              axis_x &&
-              axis_x.length > 0 &&
-              charts.find((existingChart) => existingChart.axis_x === axis_x);
-            const sharedAxisY =
-              axis_y &&
-              axis_y.length > 0 &&
-              charts.find((existingChart) => existingChart.axis_y === axis_y);
-            if (sharedAxisY) {
-              // Place series into existing chart, on the same Y axis
-              chart = sharedAxisY.chart;
-            }
-            if (!chart) {
-              // Create new chart for series
-              rowIndex = charts.reduce(
-                (prev, cur) => Math.max(prev, cur.rowIndex + 1),
-                0
-              );
-              const dashboardOptions = { columnIndex: 0, rowIndex };
-              chart = is2D
-                ? dashboard.createChartXY(dashboardOptions)
-                : dashboard.createChart3D(dashboardOptions);
-              chart.setTitle("");
-
-              if (sharedAxisX) {
-                // Synchronize X axis with an existing chart
-                axisGroupsX[axis_x] = axisGroupsX[axis_x] || [
-                  sharedAxisX.chart.getDefaultAxisX(),
-                ];
-                axisGroupsX[axis_x].push(chart.getDefaultAxisX());
-              }
-            }
-            axisX = axisX || chart.getDefaultAxisX();
-            axisY = axisY || chart.getDefaultAxisY();
-            axisZ = axisZ || (is3D && chart.getDefaultAxisZ());
-            charts.push({
-              chart,
-              rowIndex,
-              is3D,
-              is2D,
-              axis_x,
-              axis_y,
-              axis_z,
+          if (sharedAxisY) {
+            // Place series into existing chart, on the same Y axis
+            chart = sharedAxisY.chart;
+          } else if (mapAxis) {
+            // Place chart over map.
+            if (!is2D) { throw new Error(`Only 2D chart can be placed over map`)  }
+            rowIndex = mapAxis.rowIndex
+            chart = dashboard.createChartXY({ columnIndex: 0, rowIndex })
+              .setBackgroundFillStyle(transparentFill)
+              .setSeriesBackgroundFillStyle(transparentFill)
+              .setAutoCursorMode(AutoCursorModes.disabled)
+              .setMouseInteractions(false)
+            chart.forEachAxis((axis) =>
+              axis.setTickStrategy(AxisTickStrategies.Empty).setStrokeStyle(emptyLine).setTitleFillStyle(emptyFill)
+            );
+            mapAxis.chart.onViewChange((view) => {
+              chart.setPadding({
+                left: view.margin.left,
+                right: view.margin.right,
+                top: view.margin.top,
+                bottom: view.margin.bottom,
+              });
+              chart
+                .getDefaultAxisX()
+                .setInterval(
+                  view.longitudeRange.start,
+                  view.longitudeRange.end,
+                  false,
+                  true
+                );
+              chart
+                .getDefaultAxisY()
+                .setInterval(
+                  view.latitudeRange.start,
+                  view.latitudeRange.end,
+                  false,
+                  true
+                );
             });
-
-            // #endregion
-
-            const coordsX = x && parseArrayDataInput(x);
-            const coordsY = y && parseArrayDataInput(y);
-            let pointSizes = undefined;
-            const pointShape =
-              point_shape && typeof point_shape === "string"
-                ? {
-                    square: PointShape.Square,
-                    circle: PointShape.Circle,
-                    triangle: PointShape.Triangle,
-                  }[point_shape.toLowerCase()]
-                : PointShape.Circle;
-
-            if (axis_x !== undefined) {
-              axisX.setTitle(axis_x);
-              if (axis_x === "") {
-                axisX.setTickStrategy(AxisTickStrategies.Empty);
-              }
-            }
-            if (axis_y !== undefined) {
-              axisY.setTitle(axis_y);
-              if (axis_y === "") {
-                axisY.setTickStrategy(AxisTickStrategies.Empty);
-              }
-            }
-            if (axis_z !== undefined && axisZ) {
-              axisZ.setTitle(axis_z);
-              if (axis_z === "") {
-                axisZ.setTickStrategy(AxisTickStrategies.Empty);
-              }
+          }
+          if (!chart) {
+            // Create new chart for series
+            rowIndex = charts.reduce(
+              (prev, cur) => Math.max(prev, cur.rowIndex + 1),
+              0
+            );
+            const dashboardOptions = { columnIndex: 0, rowIndex };
+            chart = is2D ? dashboard.createChartXY(dashboardOptions) :
+              is3D ? dashboard.createChart3D(dashboardOptions) :
+              isMap ? dashboard.createMapChart({...dashboardOptions, type: map_view}) :
+              undefined
+            if (!chart) {
+              throw new Error(`unidentified chart type`)
             }
 
-            let series;
-            if (type === "scatter") {
-              series = chart.addPointSeries({
-                pointShape,
-              });
-            } else if (type === "line") {
-              series = chart.addLineSeries({
-                dataPattern: deduceProgressiveOrNot(coordsX, coordsY),
-              });
-            } else if (type === "point-line") {
-              series = chart.addPointLineSeries({
-                pointShape,
-                dataPattern: deduceProgressiveOrNot(coordsX, coordsY),
-              });
-            } else if (type === "heatmap") {
-              // intensity values must be specified
-              if (!intensity) {
-                throw new Error("'intensity' not specified");
-              }
+            if (sharedAxisX) {
+              // Synchronize X axis with an existing chart
+              axisGroupsX[axis_x] = axisGroupsX[axis_x] || [
+                sharedAxisX.chart.getDefaultAxisX(),
+              ];
+              axisGroupsX[axis_x].push(chart.getDefaultAxisX());
+            }
+          }
+          chart.setTitle("");
+          axisX = axisX || ('getDefaultAxisX' in chart && chart.getDefaultAxisX());
+          axisY = axisY || ('getDefaultAxisY' in chart && chart.getDefaultAxisY());
+          axisZ = axisZ || ('getDefaultAxisZ' in chart && chart.getDefaultAxisZ());
+          charts.push({
+            chart,
+            rowIndex,
+            is3D,
+            is2D,
+            isMap,
+            axis_x,
+            axis_y,
+            axis_z,
+          });
 
-              const intensityMatrix = Array.from(intensity);
-              const columns = intensityMatrix.length;
-              const rows = intensityMatrix[0].length;
-              series = chart
-                .addHeatmapGridSeries({
-                  columns,
-                  rows,
-                  dataOrder: "columns",
+          if (isMap) {
+            // In case of map chart, wait until map data is loaded before continuing with chart creation.
+            await new Promise(resolve => chart.onMapDataReady(resolve))
+          }
+
+          // #endregion
+
+          const coordsX = x && parseArrayDataInput(x);
+          const coordsY = y && parseArrayDataInput(y);
+          let pointSizes = undefined;
+          const pointShape =
+            point_shape && typeof point_shape === "string"
+              ? {
+                  square: PointShape.Square,
+                  circle: PointShape.Circle,
+                  triangle: PointShape.Triangle,
+                }[point_shape.toLowerCase()]
+              : PointShape.Circle;
+
+          if (axis_x !== undefined) {
+            axisX.setTitle(axis_x);
+            if (axis_x === "") {
+              axisX.setTickStrategy(AxisTickStrategies.Empty);
+            }
+          }
+          if (axis_y !== undefined) {
+            axisY.setTitle(axis_y);
+            if (axis_y === "") {
+              axisY.setTickStrategy(AxisTickStrategies.Empty);
+            }
+          }
+          if (axis_z !== undefined && axisZ) {
+            axisZ.setTitle(axis_z);
+            if (axis_z === "") {
+              axisZ.setTickStrategy(AxisTickStrategies.Empty);
+            }
+          }
+
+          let series;
+          if (type === "scatter") {
+            series = chart.addPointSeries({
+              pointShape,
+            });
+          } else if (type === "line") {
+            series = chart.addLineSeries({
+              dataPattern: deduceProgressiveOrNot(coordsX, coordsY),
+            });
+          } else if (type === "point-line") {
+            series = chart.addPointLineSeries({
+              pointShape,
+              dataPattern: deduceProgressiveOrNot(coordsX, coordsY),
+            });
+          } else if (type === "heatmap") {
+            // intensity values must be specified
+            if (!intensity) {
+              throw new Error("'intensity' not specified");
+            }
+
+            const intensityMatrix = Array.from(intensity);
+            const columns = intensityMatrix.length;
+            const rows = intensityMatrix[0].length;
+            series = chart
+              .addHeatmapGridSeries({
+                columns,
+                rows,
+                dataOrder: "columns",
+              })
+              .invalidateIntensityValues(intensityMatrix)
+              .setWireframeStyle(emptyLine);
+
+            if (palette) {
+              series.setFillStyle(
+                new PalettedFill({
+                  lookUpProperty: "value",
+                  lut: parsePalette(lcjs, palette, calculateMinMaxFromMatrix(intensityMatrix)),
                 })
-                .invalidateIntensityValues(intensityMatrix)
-                .setWireframeStyle(emptyLine);
+              );
+            }
+          } else if (type === "surface") {
+            // heightmap values must be specified
+            if (!heightmap) {
+              throw new Error("'heightmap' not specified");
+            }
 
+            const heightMatrix = Array.from(heightmap);
+            const columns = heightMatrix.length;
+            const rows = heightMatrix[0].length;
+            series = chart
+              .addSurfaceGridSeries({
+                columns,
+                rows,
+                dataOrder: "columns",
+              })
+              .invalidateHeightMap(heightMatrix)
+              .setWireframeStyle(emptyLine);
+
+            if (palette) {
+              series.setFillStyle(
+                new PalettedFill({
+                  lookUpProperty: "y",
+                  lut: parsePalette(lcjs, palette, calculateMinMaxFromMatrix(heightMatrix)),
+                })
+              );
+            }
+          } else if (type === "map") {
+            ifTry(map_data, _ => {
+              // Expect first column to be either ISO_AE country code or name of country, and second column a numeric value.
+              let min = Number.MAX_SAFE_INTEGER
+              let max = -Number.MAX_SAFE_INTEGER
+              chart.invalidateRegionValues((region) => {
+                const iRegionData = map_data[0].findIndex(countryIdentifier => region.name === countryIdentifier || region.ISO_A3 === countryIdentifier)
+                if (iRegionData < 0) return undefined
+                const regionValue = map_data[1][iRegionData]
+                min = Math.min(min, regionValue)
+                max = Math.max(max, regionValue)
+                return regionValue
+              })
               if (palette) {
-                series.setFillStyle(
+                chart.setFillStyle(
                   new PalettedFill({
                     lookUpProperty: "value",
-                    lut: parsePalette(lcjs, palette, intensityMatrix),
+                    lut: parsePalette(lcjs, palette, {min, max}),
                   })
                 );
               }
-            } else if (type === "surface") {
-              // heightmap values must be specified
-              if (!heightmap) {
-                throw new Error("'heightmap' not specified");
-              }
+            })
+          }
+          if (!series) {
+            continue
+          }
 
-              const heightMatrix = Array.from(heightmap);
-              const columns = heightMatrix.length;
-              const rows = heightMatrix[0].length;
-              series = chart
-                .addSurfaceGridSeries({
-                  columns,
-                  rows,
-                  dataOrder: "columns",
-                })
-                .invalidateHeightMap(heightMatrix)
-                .setWireframeStyle(emptyLine);
-
-              if (palette) {
-                series.setFillStyle(
-                  new PalettedFill({
-                    lookUpProperty: "y",
-                    lut: parsePalette(lcjs, palette, heightMatrix),
-                  })
-                );
-              }
-            }
-
-            ifTry("setMouseInteractions" in series, (_) => {
-              series.setMouseInteractions(false);
-            });
-            ifTry("setCursorInterpolationEnabled" in series, (_) => {
-              series.setCursorInterpolationEnabled(false);
-            });
-            ifTry(
-              "setPointSize" in series && typeof point_size === "number",
-              (_) => {
-                series.setPointSize(point_size);
-              }
-            );
-            ifTry(
-              "setIndividualPointSizeEnabled" in series &&
-                typeof point_size === "object",
-              (_) => {
-                pointSizes = Array.from(point_size);
-                series.setIndividualPointSizeEnabled(true);
-              }
-            );
-            ifTry("setPointFillStyle" in series && point_color, (_) => {
-              series.setPointFillStyle(
-                new SolidFill({ color: parseColor(lcjs, point_color) })
-              );
-            });
-            ifTry(
-              "setStrokeStyle" in series && typeof line_thickness === "number",
-              (_) => {
-                series.setStrokeStyle((stroke) =>
-                  stroke.setThickness(line_thickness)
-                );
-              }
-            );
-            ifTry("setStrokeStyle" in series && line_color, (_) => {
-              series.setStrokeStyle((stroke) =>
-                stroke.setFillStyle(
-                  new SolidFill({ color: parseColor(lcjs, line_color) })
-                )
-              );
-            });
-            ifTry("setColorShadingStyle" in series, (_) => {
-              series.setColorShadingStyle(new ColorShadingStyles.Phong());
-            });
-            ifTry("add" in series, (_) => {
-              const pointsCount = Math.max(
-                coordsX ? coordsX.length : 0,
-                coordsY ? coordsY.length : 0
-              );
-              const points = new Array(pointsCount).fill().map((_) => ({}));
-              if (coordsX) {
-                coordsX.forEach((x, i) => (points[i].x = x));
-              } else {
-                points.forEach((p, i) => (p.x = i));
-              }
-              if (coordsY) {
-                coordsY.forEach((y, i) => (points[i].y = y));
-              } else {
-                points.forEach((p, i) => (p.y = i));
-              }
-              if (pointSizes) {
-                pointSizes.forEach((size, i) => (points[i].size = size));
-              }
-              series.add(points);
-            });
+          ifTry("setMouseInteractions" in series, (_) => {
+            series.setMouseInteractions(false);
           });
-        });
+          ifTry("setCursorInterpolationEnabled" in series, (_) => {
+            series.setCursorInterpolationEnabled(false);
+          });
+          ifTry(
+            "setPointSize" in series && typeof point_size === "number",
+            (_) => {
+              series.setPointSize(point_size);
+            }
+          );
+          ifTry(
+            "setIndividualPointSizeEnabled" in series &&
+              typeof point_size === "object",
+            (_) => {
+              pointSizes = Array.from(point_size);
+              series.setIndividualPointSizeEnabled(true);
+            }
+          );
+          ifTry("setPointFillStyle" in series && point_color, (_) => {
+            series.setPointFillStyle(
+              new SolidFill({ color: parseColor(lcjs, point_color) })
+            );
+          });
+          ifTry(
+            "setStrokeStyle" in series && typeof line_thickness === "number",
+            (_) => {
+              series.setStrokeStyle((stroke) =>
+                stroke.setThickness(line_thickness)
+              );
+            }
+          );
+          ifTry("setStrokeStyle" in series && line_color, (_) => {
+            series.setStrokeStyle((stroke) =>
+              stroke.setFillStyle(
+                new SolidFill({ color: parseColor(lcjs, line_color) })
+              )
+            );
+          });
+          ifTry("setColorShadingStyle" in series, (_) => {
+            series.setColorShadingStyle(new ColorShadingStyles.Phong());
+          });
+          ifTry("add" in series, (_) => {
+            const pointsCount = Math.max(
+              coordsX ? coordsX.length : 0,
+              coordsY ? coordsY.length : 0
+            );
+            const points = new Array(pointsCount).fill().map((_) => ({}));
+            if (coordsX) {
+              coordsX.forEach((x, i) => (points[i].x = x));
+            } else {
+              points.forEach((p, i) => (p.x = i));
+            }
+            if (coordsY) {
+              coordsY.forEach((y, i) => (points[i].y = y));
+            } else {
+              points.forEach((p, i) => (p.y = i));
+            }
+            if (pointSizes) {
+              pointSizes.forEach((size, i) => (points[i].size = size));
+            }
+            series.add(points);
+          });
+        };
 
         // #endregion
 
@@ -328,8 +406,12 @@ HTMLWidgets.widget({
 
         ifTry(true, (_) => {
           charts.forEach((chart) => {
-            chart.chart.getDefaultAxisX().fit(false);
-            chart.chart.getDefaultAxisY().fit(false);
+            if ("getDefaultAxisX" in chart.chart) {
+              chart.chart.getDefaultAxisX().fit(false);
+            }
+            if ("getDefaultAxisY" in chart.chart) {
+              chart.chart.getDefaultAxisY().fit(false);
+            }
             if ("getDefaultAxisZ" in chart.chart) {
               chart.chart.getDefaultAxisZ().fit(false);
             }
@@ -426,9 +508,26 @@ function parseColor(lcjs, colorInput) {
 /**
  * Parse input color palette to LCJS Color lookup table.
  */
-function parsePalette(lcjs, paletteInput, valueMatrix) {
+function parsePalette(lcjs, paletteInput, minMax) {
   const { LUT, ColorHEX } = lcjs;
   try {
+
+    const colors = Array.from(paletteInput);
+    return new LUT({
+      interpolate: true,
+      steps: colors.map((colorStringHex, iStep) => ({
+        value: minMax.min + (iStep / colors.length) * (minMax.max - minMax.min),
+        color: ColorHEX(colorStringHex),
+      })),
+    });
+  } catch (e) {
+    console.warn(`parsePalette error ${e.message}`)
+    // Return error palette
+    return undefined
+  }
+}
+
+function calculateMinMaxFromMatrix(matrix) {
     // Calculate value range (min - max)
     let min = Number.MAX_SAFE_INTEGER;
     let max = -Number.MAX_SAFE_INTEGER;
@@ -438,19 +537,7 @@ function parsePalette(lcjs, paletteInput, valueMatrix) {
         max = Math.max(max, value);
       }
     }
-
-    const colors = Array.from(paletteInput);
-    return new LUT({
-      interpolate: true,
-      steps: colors.map((colorStringHex, iStep) => ({
-        value: min + (iStep / colors.length) * (max - min),
-        color: ColorHEX(colorStringHex),
-      })),
-    });
-  } catch (e) {
-    // Return error palette
-    return new LUT({});
-  }
+    return {min, max}
 }
 
 /**
@@ -460,6 +547,8 @@ function ifTry(condition, clbk) {
   if (condition) {
     try {
       clbk();
-    } catch (e) {}
+    } catch (e) {
+      console.warn(`ifTry block errored ${e.message}`)
+    }
   }
 }

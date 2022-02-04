@@ -69,6 +69,15 @@
 #' Optionally, surface can be dynamically colored by height by supplying color palette (e.g. \code{palette = heat.colors(10)}).
 #' First color is associated with lowest value and last color with highest value.
 #'
+#' \code{'map'}:
+#'
+#' Visualize a map. Map view is specified with \code{map_view} argument.
+#'
+#' Map regions can be colored individually by using \code{map_data} and \code{palette} arguments.
+#'
+#' Other 2D series can be placed above a map by \code{axis_x = 'map'}.
+#' This can be used to plot scatter, bubble, line and such graphs using latitude/longitude coordinates.
+#'
 #' @param x   Specify list of X coordinates for series (table with 1 column and n rows)
 #'
 #' @param y   Specify list of Y coordinates for series (table with 1 column and n rows)
@@ -110,6 +119,14 @@
 #'
 #' @param line_color  Specify color of lines as hexadecimal code (e.g. \code{'#ff0000'} for red)
 #'
+#' @param map_data    Specify map regions data set.
+#'
+#' This should be a table with 2 columns, where first one contains region ISO_A3 code (e.g. \code{'FIN'}) or name (e.g. \code{'finland'})
+#'
+#' Second column contains numeric value which can be used for coloring with \code{palette} argument or simply viewed with interactive cursor.
+#'
+#' @param map_view    Specify map view when using \code{type = 'map'}. Possible options: \code{'World'}, \code{'Europe'}, \code{'Africa'}, \code{'Asia'}, \code{'NorthAmerica'}, \code{'SouthAmerica'}, \code{'Australia'}, \code{'USA'}, \code{'Canada'}
+#'
 #' @export
 #' @seealso   [lc4r()]
 lcSeries <- function(
@@ -126,7 +143,9 @@ lcSeries <- function(
     point_color = NULL,
     point_shape = NULL,
     line_thickness = NULL,
-    line_color = NULL
+    line_color = NULL,
+    map_data = NULL,
+    map_view = NULL
 ) {
   series <- list()
   series$id_ <- 'series'
@@ -144,6 +163,8 @@ lcSeries <- function(
   series$point_shape <- point_shape
   series$line_thickness <- line_thickness
   series$line_color <- line_color
+  series$map_data <- map_data
+  series$map_view <- map_view
 
   # return series description
   series

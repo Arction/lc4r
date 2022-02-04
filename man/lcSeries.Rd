@@ -18,7 +18,9 @@ lcSeries(
   point_color = NULL,
   point_shape = NULL,
   line_thickness = NULL,
-  line_color = NULL
+  line_color = NULL,
+  map_data = NULL,
+  map_view = NULL
 )
 }
 \arguments{
@@ -84,21 +86,25 @@ Visualize a number table as a 3D surface (cell value = height).
 Heightmap is supplied with \code{heightmap} argument (e.g., \code{heightmap = volcano}).
 
 Optionally, surface can be dynamically colored by height by supplying color palette (e.g. \code{palette = heat.colors(10)}).
-First color is associated with lowest value and last color with highest value.}
+First color is associated with lowest value and last color with highest value.
+
+\code{'map'}:
+
+TODO}
 
 \item{x}{Specify list of X coordinates for series (table with 1 column and n rows)}
 
 \item{y}{Specify list of Y coordinates for series (table with 1 column and n rows)}
 
-\item{axis_x}{Specify X axis for series (e.g. \code{'Price (€)'})
+\item{axis_x}{Specify X axis for series (e.g. \code{'Price'})
 
 Several series can be placed on the same X axis by specifying the exact same argument for \code{axis_x}}
 
-\item{axis_y}{Specify Y axis for series (e.g. \code{'Price (€)'})
+\item{axis_y}{Specify Y axis for series (e.g. \code{'Price'})
 
 Several series can be placed on the same Y axis by specifying the exact same argument for \code{axis_y}}
 
-\item{axis_z}{Specify Z axis for series (e.g. \code{'Price (€)'})
+\item{axis_z}{Specify Z axis for series (e.g. \code{'Price'})
 
 Z axis is only available when the series \code{type} indicates a 3D series.}
 
@@ -119,13 +125,17 @@ Used with \code{type = 'heatmap'} or \code{type = 'surface'} series.}
 Alternatively, a data set can be provided, in which case each point can have a different size.
 e.g. \code{point_size = my_dataset$sizes}}
 
-\item{point_color}{Specify color of point markers as hexadecimal code (e.g. #ff0000 for red)}
+\item{point_color}{Specify color of point markers as hexadecimal code (e.g. \code{'#ff0000'} for red)}
 
 \item{point_shape}{Specify shape of point markers from preset options: \code{'circle'}, \code{'square'}, \code{'triangle'}}
 
 \item{line_thickness}{Specify thickness of lines as pixels (e.g. \code{line_thickness = 2.0})}
 
-\item{line_color}{Specify color of lines as hexadecimal code (e.g. #ff0000 for red)}
+\item{line_color}{Specify color of lines as hexadecimal code (e.g. \code{'#ff0000'} for red)}
+
+\item{map_data}{TODO}
+
+\item{map_view}{TODO}
 }
 \description{
 {

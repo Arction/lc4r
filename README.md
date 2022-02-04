@@ -38,6 +38,20 @@
 
 ![Interactive R Surface Chart](./readme/screenshots/surface.jpeg)
 
+**Map charts**
+
+- Dynamically coloring countries or other map regions using ISO_A3 codes or names.
+  - Supports R color palettes (native, `RColorBrewer`, `Viridis`)
+- Can be combined with other 2D features such as scatter, bubbles, lines, etc.
+
+![R Map Countries Color Chart](./readme/screenshots/map-countries.png)
+
+![R Map Scatter Plot Chart](./readme/screenshots/map-scatter.png)
+
+
+
+
+
 # Installation and usage
 
 The latest version of `lc4r` can be installed via R `devtools`.
