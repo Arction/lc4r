@@ -23,3 +23,28 @@ Pull requests should exist for improving the package in any way:
 - When modifying existing features, include descriptions of current behavior and proposed behavior (including code snippets and pictures of produced data visualization)
 
 New pull requests can be created [here](https://github.com/Arction/lcjs4r/compare)
+
+# Developing the lc4r package
+
+`lc4r` is based on [htmlwidgets](https://www.htmlwidgets.org/), a popular framework for porting `JavaScript` based data visualization tools to `R`.
+
+To develop `lc4r` you don't really need to know much about `htmlwidgets` as the base idea is very simple. There are two parts to the `lc4r` package:
+
+1. R binding
+2. JavaScript binding
+
+**R binding**
+
+The R binding is a set of `R` documented R functions which users can access. They can be found in [the `R/` folder](https://github.com/Arction/lcjs4r/R).
+
+At least at the time of writing there is no `R` logic implemented **at all**. The `lc4r R` functions simply pass the user arguments into the JavaScript binding.
+
+**JavaScript binding**
+
+The JavaScript binding can be found in [`inst/htmlwidgets/lc4r.js`](https://github.com/Arction/lcjs4r/inst/htmlwidgets/lc4r.js).
+This is a single JavaScript file which receives all R user arguments and translates them into `LightningChart JS` configurations.
+
+Over here, development requires understanding about `LightningChart JS` usage. Here are some useful resources:
+
+- [LightningChart JS examples](https://www.arction.com/lightningchart-js-interactive-examples/) gallery, which allows live editing
+- [LightningChart JS API documentation](https://www.arction.com/lightningchart-js-api-documentation)
