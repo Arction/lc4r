@@ -35,13 +35,13 @@ To develop `lc4r` you don't really need to know much about `htmlwidgets` as the 
 
 **R binding**
 
-The R binding is a set of `R` documented R functions which users can access. They can be found in [the `R/` folder](https://github.com/Arction/lcjs4r/R).
+The R binding is a set of `R` documented R functions which users can access. They can be found in [the `R/` folder](https://github.com/Arction/lc4r/tree/master/R).
 
 At least at the time of writing there is no `R` logic implemented **at all**. The `lc4r R` functions simply pass the user arguments into the JavaScript binding.
 
 **JavaScript binding**
 
-The JavaScript binding can be found in [`inst/htmlwidgets/lc4r.js`](https://github.com/Arction/lcjs4r/inst/htmlwidgets/lc4r.js).
+The JavaScript binding can be found in [`inst/htmlwidgets/lc4r.js`](https://github.com/Arction/lc4r/blob/master/inst/htmlwidgets/lc4r.js).
 This is a single JavaScript file which receives all R user arguments and translates them into `LightningChart JS` configurations.
 
 Over here, development requires understanding about `LightningChart JS` usage. Here are some useful resources:
